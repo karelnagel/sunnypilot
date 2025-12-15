@@ -22,9 +22,14 @@ class LiveStreamVideoStreamTrack(TiciVideoStreamTrack):
     self._sock = messaging.sub_sock(self.camera_to_sock_mapping[camera_type], conflate=True)
     self._pts = 0
     self._t0_ns = time.monotonic_ns()
+    self.paused = True
 
   async def recv(self):
     while True:
+      while self.paused:
+        await asyncio.sleep(0.2)
+        messaging.drain_sock(self._sock)
+
       msg = messaging.recv_one_or_none(self._sock)
       if msg is not None:
         break
