@@ -227,7 +227,7 @@ def setSdpAnswer(answer:str):
       "bridge_services_in": [],
       "bridge_services_out": []
     }
-    response = requests.post("http://127.0.0.1:5001/stream", json=data, timeout=5)
+    response = requests.post("http://0.0.0.0:5001/stream", json=data, timeout=5)
     response.raise_for_status()
     res = response.json()
     logger.warning(f"setSdpAnswer {res=}")
