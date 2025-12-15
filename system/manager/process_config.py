@@ -37,6 +37,10 @@ def ublox(started: bool, params: Params, CP: car.CarParams) -> bool:
     params.put_bool("UbloxAvailable", use_ublox)
   return started and use_ublox
 
+def webrtc(started: bool, params: Params, CP: car.CarParams) -> bool:
+  # TODO: add a toggle
+  return True
+
 def joystick(started: bool, params: Params, CP: car.CarParams) -> bool:
   return started and params.get_bool("JoystickDebugMode")
 
@@ -112,11 +116,11 @@ procs = [
 
   NativeProcess("loggerd", "system/loggerd", ["./loggerd"], logging),
   NativeProcess("encoderd", "system/loggerd", ["./encoderd"], only_onroad),
-  NativeProcess("stream_encoderd", "system/loggerd", ["./encoderd", "--stream"], always_run),
+  NativeProcess("stream_encoderd", "system/loggerd", ["./encoderd", "--stream"], or_(notcar, webrtc)),
   PythonProcess("logmessaged", "system.logmessaged", always_run),
 
-  NativeProcess("camerad", "system/camerad", ["./camerad"], always_run, enabled=not WEBCAM),
-  PythonProcess("webcamerad", "tools.webcam.camerad", always_run, enabled=WEBCAM),
+  NativeProcess("camerad", "system/camerad", ["./camerad"], or_(driverview, webrtc), enabled=not WEBCAM),
+  PythonProcess("webcamerad", "tools.webcam.camerad", or_(driverview, webrtc), enabled=WEBCAM),
   PythonProcess("proclogd", "system.proclogd", only_onroad, enabled=platform.system() != "Darwin"),
   PythonProcess("journald", "system.journald", only_onroad, platform.system() != "Darwin"),
   PythonProcess("micd", "system.micd", iscar),
@@ -125,15 +129,15 @@ procs = [
   PythonProcess("modeld", "selfdrive.modeld.modeld", and_(only_onroad, is_stock_model)),
   PythonProcess("dmonitoringmodeld", "selfdrive.modeld.dmonitoringmodeld", driverview, enabled=(WEBCAM or not PC)),
 
-  PythonProcess("sensord", "system.sensord.sensord", always_run, enabled=not PC),
+  PythonProcess("sensord", "system.sensord.sensord", only_onroad, enabled=not PC),
   PythonProcess("ui", "selfdrive.ui.ui", always_run, restart_if_crash=True),
   PythonProcess("soundd", "selfdrive.ui.soundd", driverview),
   PythonProcess("locationd", "selfdrive.locationd.locationd", only_onroad),
   NativeProcess("_pandad", "selfdrive/pandad", ["./pandad"], always_run, enabled=False),
   PythonProcess("calibrationd", "selfdrive.locationd.calibrationd", only_onroad),
   PythonProcess("torqued", "selfdrive.locationd.torqued", only_onroad),
-  PythonProcess("controlsd", "selfdrive.controls.controlsd", and_(not_joystick, always_run)),
-  PythonProcess("joystickd", "tools.joystick.joystickd", or_(joystick, always_run)),
+  PythonProcess("controlsd", "selfdrive.controls.controlsd", and_(not_joystick, iscar)),
+  PythonProcess("joystickd", "tools.joystick.joystickd", or_(joystick, notcar)),
   PythonProcess("selfdrived", "selfdrive.selfdrived.selfdrived", only_onroad),
   PythonProcess("card", "selfdrive.car.card", only_onroad),
   PythonProcess("deleter", "system.loggerd.deleter", always_run),
@@ -155,10 +159,10 @@ procs = [
   PythonProcess("feedbackd", "selfdrive.ui.feedback.feedbackd", only_onroad),
 
   # debug procs
-  NativeProcess("bridge", "cereal/messaging", ["./bridge"], always_run),
-  PythonProcess("webrtcd", "system.webrtc.webrtcd", always_run),
-  PythonProcess("webjoystick", "tools.bodyteleop.web", always_run),
-  PythonProcess("joystick", "tools.joystick.joystick_control", and_(joystick, always_run)),
+  NativeProcess("bridge", "cereal/messaging", ["./bridge"], or_(notcar, webrtc)),
+  PythonProcess("webrtcd", "system.webrtc.webrtcd", or_(notcar, webrtc)),
+  PythonProcess("webjoystick", "tools.bodyteleop.web", notcar),
+  PythonProcess("joystick", "tools.joystick.joystick_control", and_(joystick, iscar)),
 
   # sunnylink <3
   DaemonProcess("manage_sunnylinkd", "sunnypilot.sunnylink.athena.manage_sunnylinkd", "SunnylinkdPid"),
