@@ -226,7 +226,9 @@ def setSdpAnswer(answer:str):
     }
     response = requests.post("http://127.0.0.1:5001/stream", json=data, timeout=5)
     response.raise_for_status()
-    return response.json()
+    res = response.json()
+    cloudlog.debug(f"returning {res}")
+    return res
   except Exception as e:
     cloudlog.exception("athena.webrtc.exception")
     return {"error": str(e)}
