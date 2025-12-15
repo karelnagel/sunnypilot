@@ -227,7 +227,7 @@ def webrtc(sdp:str):
       "bridge_services_in": [],
       "bridge_services_out": []
     }
-    response = requests.post("http://0.0.0.0:5001/stream", json=data, timeout=5)
+    response = requests.post("http://0.0.0.0:5001/stream", json=data, timeout=60)
     response.raise_for_status()
     res = response.json()
     logger.warning(f"sdp {res=}")
