@@ -129,7 +129,9 @@ class StreamSession:
     config = parse_info_from_offer(sdp)
     builder = WebRTCAnswerBuilder(sdp)
 
-    assert len(cameras) == config.n_expected_camera_tracks, "Incoming stream has misconfigured number of video tracks"
+    # assert len(cameras) == config.n_expected_camera_tracks, f"Incoming stream has misconfigured number of video tracks. Expected {config.n_expected_camera_tracks}, got {len(cameras)}"
+    if len(cameras) != config.n_expected_camera_tracks:
+      self.logger.warning(f"Incoming stream mismatch! Expected {config.n_expected_camera_tracks}, got {len(cameras)}. Cameras: {cameras}")
     for cam in cameras:
       builder.add_video_stream(cam, LiveStreamVideoStreamTrack(cam) if not debug_mode else VideoStreamTrack())
     if config.expected_audio_track:

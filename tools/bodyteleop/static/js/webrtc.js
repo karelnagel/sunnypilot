@@ -144,8 +144,8 @@ export function start(pc, dc) {
         });
       }
 
-      pc.addTransceiver('video', { direction: 'recvonly' });
-      pc.addTransceiver('video', { direction: 'recvonly' });
+      pc.addTransceiver('video', { direction: 'sendrecv' });
+      pc.addTransceiver('video', { direction: 'sendrecv' });
 
       return negotiate(pc);
     })
