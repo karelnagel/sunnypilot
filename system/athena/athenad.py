@@ -216,39 +216,13 @@ def rtc_handler(end_event: threading.Event, sdp_send_queue: queue.Queue, sdp_rec
     loop.close()
 
 @dispatcher.add_method
-def setSdpAnswer(answer):
-  sdp_recv_queue.put_nowait(answer)
-
-@dispatcher.add_method
-def getSdp():
-  start_time = time.time()
-  timeout = 10
-  while time.time() - start_time < timeout:
-    try:
-      sdp = json.loads(sdp_send_queue.get(timeout=0.1))
-      if sdp:
-        return sdp
-    except queue.Empty:
-      pass
-
-@dispatcher.add_method
-def getIce():
-  if not ice_send_queue.empty():
-    return json.loads(ice_send_queue.get_nowait())
-  else:
-    return {
-      'error': True
-    }
-
-
-@dispatcher.add_method
-def webrtc(sdp: str, cameras: list[str], bridge_services_in: list[str], bridge_services_out: list[str]):
+def setSdpAnswer(sdp):
   try:
     data = {
       "sdp": sdp,
-      "cameras": cameras,
-      "bridge_services_in": bridge_services_in,
-      "bridge_services_out": bridge_services_out
+      "cameras": ["driver", "wideRoad"],
+      "bridge_services_in": [],
+      "bridge_services_out": []
     }
     response = requests.post("http://127.0.0.1:5001/stream", json=data, timeout=5)
     response.raise_for_status()
