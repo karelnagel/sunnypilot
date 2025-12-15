@@ -129,18 +129,11 @@ class StreamSession:
     config = parse_info_from_offer(sdp)
     builder = WebRTCAnswerBuilder(sdp)
 
-    # assert len(cameras) == config.n_expected_camera_tracks, "Incoming stream has misconfigured number of video tracks"
+    assert len(cameras) == config.n_expected_camera_tracks, "Incoming stream has misconfigured number of video tracks"
     for cam in cameras:
       builder.add_video_stream(cam, LiveStreamVideoStreamTrack(cam) if not debug_mode else VideoStreamTrack())
     if config.expected_audio_track:
-      audio_track = None
-      if not debug_mode:
-        try:
-          audio_track = AudioInputStreamTrack()
-        except Exception:
-          self.logger.warning("Failed to initialize AudioInputStreamTrack, falling back to dummy track", exc_info=True)
-
-      builder.add_audio_stream(audio_track or AudioStreamTrack())
+      builder.add_audio_stream(AudioInputStreamTrack() if not debug_mode else AudioStreamTrack())
     if config.incoming_audio_track:
       self.audio_output_cls = AudioOutputSpeaker if not debug_mode else MediaBlackhole
       builder.offer_to_receive_audio_stream()
@@ -197,13 +190,7 @@ class StreamSession:
           self.outgoing_bridge_runner.start()
       if self.stream.has_incoming_audio_track():
         track = self.stream.get_incoming_audio_track(buffered=False)
-        try:
-          self.audio_output = self.audio_output_cls()
-        except Exception:
-          from aiortc.contrib.media import MediaBlackhole
-          self.logger.warning("Failed to initialize AudioOutputSpeaker, falling back to MediaBlackhole", exc_info=True)
-          self.audio_output = MediaBlackhole()
-
+        self.audio_output = self.audio_output_cls()
         self.audio_output.addTrack(track)
         self.audio_output.start()
       self.logger.info("Stream session (%s) connected", self.identifier)
