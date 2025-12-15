@@ -242,7 +242,7 @@ def getIce():
 
 
 @dispatcher.add_method
-def forwardWebRTC(sdp: str, cameras: list[str], bridge_services_in: list[str], bridge_services_out: list[str]):
+def webrtc(sdp: str, cameras: list[str], bridge_services_in: list[str], bridge_services_out: list[str]):
   try:
     data = {
       "sdp": sdp,
@@ -254,7 +254,7 @@ def forwardWebRTC(sdp: str, cameras: list[str], bridge_services_in: list[str], b
     response.raise_for_status()
     return response.json()
   except Exception as e:
-    cloudlog.exception("athena.forwardWebRTC.exception")
+    cloudlog.exception("athena.webrtc.exception")
     return {"error": str(e)}
 
 
