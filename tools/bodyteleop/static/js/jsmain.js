@@ -20,7 +20,7 @@ setInterval( () => {
     $(".pre-blob").removeClass('blob');
     $("#battery").text("-");
     $("#ping-time").text('-');
-    $("video").each((i, vid) => vid.load());
+    $("video")[0].load();
   }
 }, 5000);
 

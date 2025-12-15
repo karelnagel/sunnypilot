@@ -96,8 +96,7 @@ async def sound(request: 'web.Request'):
 
 async def offer(request: 'web.Request'):
   params = await request.json()
-  print(params["sdp"])
-  body = StreamRequestBody(params["sdp"], ["driver", "wideRoad"], ["testJoystick"], ["carState"])
+  body = StreamRequestBody(params["sdp"], ["driver"], ["testJoystick"], ["carState"])
   body_json = json.dumps(dataclasses.asdict(body))
 
   logger.info("Sending offer to webrtcd...")

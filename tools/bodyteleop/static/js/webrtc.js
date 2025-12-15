@@ -40,33 +40,18 @@ export function createPeerConnection(pc) {
 
   // connect audio / video
   pc.addEventListener('track', function(evt) {
-    console.log("Adding Tracks!", evt.track.kind, evt.streams[0].id);
-    if (evt.track.kind === 'video') {
-      const streamId = evt.streams[0].id;
-      const newStream = new MediaStream([evt.track]);
-      if (streamId === 'driver') {
-        document.getElementById('video-driver').srcObject = newStream;
-      } else if (streamId === 'wideRoad') {
-        document.getElementById('video-wideRoad').srcObject = newStream;
-      } else {
-        // Fallback or default behavior if IDs don't match
-        console.warn("Unknown stream ID:", streamId);
-        if (!document.getElementById('video-driver').srcObject) {
-             document.getElementById('video-driver').srcObject = newStream;
-        } else {
-             document.getElementById('video-wideRoad').srcObject = newStream;
-        }
-      }
-    } else {
+    console.log("Adding Tracks!")
+    if (evt.track.kind == 'video')
+      document.getElementById('video').srcObject = evt.streams[0];
+    else
       document.getElementById('audio').srcObject = evt.streams[0];
-    }
   });
   return pc;
 }
 
 
 export function negotiate(pc) {
-  return pc.createOffer().then(function(offer) {
+  return pc.createOffer({offerToReceiveAudio:true, offerToReceiveVideo:true}).then(function(offer) {
     return pc.setLocalDescription(offer);
   }).then(function() {
     return new Promise(function(resolve) {
@@ -85,7 +70,6 @@ export function negotiate(pc) {
     });
   }).then(function() {
     var offer = pc.localDescription;
-    console.log(offer.sdp)
     return offerRtcRequest(offer.sdp, offer.type);
   }).then(function(response) {
     console.log(response);
@@ -145,9 +129,6 @@ export function start(pc, dc) {
         });
       }
 
-      pc.addTransceiver('video', { direction: 'recvonly' });
-      pc.addTransceiver('video', { direction: 'recvonly' });
-
       return negotiate(pc);
     })
     .catch(function(err) {
@@ -192,7 +173,7 @@ export function start(pc, dc) {
   dc.onmessage = function(evt) {
     const text = textDecoder.decode(evt.data);
     const msg = JSON.parse(text);
-    if (carStaterIndex % 100 === 0 && msg.type === 'carState') {
+    if (carStaterIndex % 100 == 0 && msg.type === 'carState') {
       const batteryLevel = Math.round(msg.data.fuelGauge * 100);
       $("#battery").text(batteryLevel + "%");
       batteryPoints.push({'x': new Date().getTime(), 'y': batteryLevel});
