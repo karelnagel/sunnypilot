@@ -216,10 +216,10 @@ def rtc_handler(end_event: threading.Event, sdp_send_queue: queue.Queue, sdp_rec
     loop.close()
 
 @dispatcher.add_method
-def setSdpAnswer(sdp:str):
+def setSdpAnswer(answer:str):
   try:
     data = {
-      "sdp": sdp,
+      "sdp": answer,
       "cameras": ["driver", "wideRoad"],
       "bridge_services_in": [],
       "bridge_services_out": []
