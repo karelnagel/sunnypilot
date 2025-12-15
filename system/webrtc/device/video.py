@@ -16,7 +16,6 @@ class LiveStreamVideoStreamTrack(TiciVideoStreamTrack):
   }
 
   def __init__(self, camera_type: str):
-    print(f"DEBUG: Initializing LiveStreamVideoStreamTrack with camera_type={camera_type}")
     dt = DT_DMON if camera_type == "driver" else DT_MDL
     super().__init__(camera_type, dt)
 

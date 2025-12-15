@@ -43,17 +43,18 @@ export function createPeerConnection(pc) {
     console.log("Adding Tracks!", evt.track.kind, evt.streams[0].id);
     if (evt.track.kind === 'video') {
       const streamId = evt.streams[0].id;
+      const newStream = new MediaStream([evt.track]);
       if (streamId === 'driver') {
-        document.getElementById('video-driver').srcObject = evt.streams[0];
+        document.getElementById('video-driver').srcObject = newStream;
       } else if (streamId === 'wideRoad') {
-        document.getElementById('video-wideRoad').srcObject = evt.streams[0];
+        document.getElementById('video-wideRoad').srcObject = newStream;
       } else {
         // Fallback or default behavior if IDs don't match
         console.warn("Unknown stream ID:", streamId);
         if (!document.getElementById('video-driver').srcObject) {
-             document.getElementById('video-driver').srcObject = evt.streams[0];
+             document.getElementById('video-driver').srcObject = newStream;
         } else {
-             document.getElementById('video-wideRoad').srcObject = evt.streams[0];
+             document.getElementById('video-wideRoad').srcObject = newStream;
         }
       }
     } else {
