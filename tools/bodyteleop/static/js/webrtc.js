@@ -84,6 +84,7 @@ export function negotiate(pc) {
     });
   }).then(function() {
     var offer = pc.localDescription;
+    console.log(offer.sdp)
     return offerRtcRequest(offer.sdp, offer.type);
   }).then(function(response) {
     console.log(response);
