@@ -122,7 +122,7 @@ class StreamSession:
     from aiortc.mediastreams import VideoStreamTrack, AudioStreamTrack
     from aiortc.contrib.media import MediaBlackhole
     from openpilot.system.webrtc.device.video import LiveStreamVideoStreamTrack
-    from openpilot.system.webrtc.device.audio import AudioInputStreamTrack, AudioOutputSpeaker, CerealAudioStreamTrack
+    from openpilot.system.webrtc.device.audio import AudioInputStreamTrack, AudioOutputSpeaker, CerealAudioStreamTrack, SocketAudioOutput
     from teleoprtc import WebRTCAnswerBuilder
     from teleoprtc.info import parse_info_from_offer
 
