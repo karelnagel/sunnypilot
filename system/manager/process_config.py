@@ -123,7 +123,7 @@ procs = [
   PythonProcess("webcamerad", "tools.webcam.camerad", or_(driverview, webrtc), enabled=WEBCAM),
   PythonProcess("proclogd", "system.proclogd", only_onroad, enabled=platform.system() != "Darwin"),
   PythonProcess("journald", "system.journald", only_onroad, platform.system() != "Darwin"),
-  PythonProcess("micd", "system.micd", or_(iscar, webrtc)),
+  PythonProcess("micd", "system.micd", webrtc),
   PythonProcess("timed", "system.timed", always_run, enabled=not PC),
 
   PythonProcess("modeld", "selfdrive.modeld.modeld", and_(only_onroad, is_stock_model)),
@@ -160,7 +160,7 @@ procs = [
 
   # debug procs
   NativeProcess("bridge", "cereal/messaging", ["./bridge"], or_(notcar, webrtc)),
-  PythonProcess("webrtcd", "system.webrtc.webrtcd", or_(notcar, webrtc)),
+  PythonProcess("webrtcd", "system.webrtc.webrtcd", always_run),
   PythonProcess("webjoystick", "tools.bodyteleop.web", notcar),
   PythonProcess("joystick", "tools.joystick.joystick_control", and_(joystick, iscar)),
 
