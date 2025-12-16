@@ -144,7 +144,7 @@ class StreamSession:
         audio_track = AudioStreamTrack()
       builder.add_audio_stream(audio_track)
     if config.incoming_audio_track:
-      self.audio_output_cls = SocketAudioOutput if not debug_mode else MediaBlackhole
+      self.audio_output_cls = AudioOutputSpeaker if not debug_mode else MediaBlackhole
       builder.offer_to_receive_audio_stream()
 
     self.stream = builder.stream()
@@ -160,7 +160,7 @@ class StreamSession:
       self.outgoing_bridge = CerealOutgoingMessageProxy(messaging.SubMaster(outgoing_services))
       self.outgoing_bridge_runner = CerealProxyRunner(self.outgoing_bridge)
 
-    self.audio_output: SocketAudioOutput | MediaBlackhole | None = None
+    self.audio_output: AudioOutputSpeaker | MediaBlackhole | None = None
     self.run_task: asyncio.Task | None = None
     self.logger = logging.getLogger("webrtcd")
     self.logger.info("New stream session (%s), cameras %s, audio in %s out %s, incoming services %s, outgoing services %s",
