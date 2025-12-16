@@ -145,3 +145,44 @@ class CerealAudioStreamTrack(aiortc.mediastreams.AudioStreamTrack):
     frame.pts = self.pts
     self.pts += frame.samples
     return frame
+
+
+class SocketAudioOutput:
+  def __init__(self, audio_format: int = pyaudio.paInt16, rate: int = 48000, channels: int = 1):
+    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    self.dest = ('127.0.0.1', 27000)
+    self.rate = rate
+    self.channels = channels
+    self.tracks_and_tasks: list[tuple[aiortc.MediaStreamTrack, asyncio.Task | None]] = []
+
+  async def __consume(self, track):
+    while True:
+      try:
+        frame = await track.recv()
+      except aiortc.MediaStreamError:
+        return
+
+      data = bytes(frame.planes[0])
+      try:
+        self.sock.sendto(data, self.dest)
+      except Exception:
+        pass
+
+  def hasTrack(self, track: aiortc.MediaStreamTrack) -> bool:
+    return any(t == track for t, _ in self.tracks_and_tasks)
+
+  def addTrack(self, track: aiortc.MediaStreamTrack):
+    if not self.hasTrack(track):
+      self.tracks_and_tasks.append((track, None))
+
+  def start(self):
+    for index, (track, task) in enumerate(self.tracks_and_tasks):
+      if task is None:
+        self.tracks_and_tasks[index] = (track, asyncio.create_task(self.__consume(track)))
+
+  def stop(self):
+    for _, task in self.tracks_and_tasks:
+      if task is not None:
+        task.cancel()
+    self.tracks_and_tasks = []
+    self.sock.close()
