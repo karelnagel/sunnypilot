@@ -17,6 +17,7 @@ class UIStateSP:
     ]
 
   def update(self) -> None:
+    pass
 
   def update_params(self) -> None:
     CP_SP_bytes = self.params.get("CarParamsSPPersistent")
