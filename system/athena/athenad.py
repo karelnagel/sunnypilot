@@ -49,6 +49,7 @@ LOCAL_PORT_WHITELIST = {22, }  # SSH
 LOG_ATTR_NAME = 'user.upload'
 LOG_ATTR_VALUE_MAX_UNIX_TIME = int.to_bytes(2147483647, 4, sys.byteorder)
 RECONNECT_TIMEOUT_S = 70
+METADATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "params_metadata.json")
 
 RETRY_DELAY = 10  # seconds
 MAX_RETRY_COUNT = 30  # Try for at most 5 minutes if upload fails immediately
@@ -873,6 +874,85 @@ def ws_manage(ws: WebSocket, end_event: threading.Event) -> None:
 
 def backoff(retries: int) -> int:
   return random.randrange(0, min(128, int(2 ** retries)))
+
+
+
+def get_param_as_byte(key: str, get_default: bool = False) -> bytes | None:
+  return Params().get(key)
+
+def save_param_from_base64_encoded_string(key: str, value: str, compression: bool = False) -> None:
+  decoded_value = base64.b64decode(value)
+  if compression:
+    decoded_value = gzip.decompress(decoded_value)
+  Params().put(key, decoded_value)
+
+@dispatcher.add_method
+def getParamsAllKeysV1() -> dict[str, str]:
+  try:
+    with open(METADATA_PATH) as f:
+      metadata = json.load(f)
+  except Exception:
+    cloudlog.exception("athenad.getParamsAllKeysV1.exception")
+    metadata = {}
+
+  available_keys: list[str] = [k.decode('utf-8') for k in Params().all_keys()]
+
+  params_dict: dict[str, list[dict[str, str | bool | int | object | dict | None]]] = {"params": []}
+  params = Params()
+  for key in available_keys:
+    value = params.get(key)
+
+    param_entry = {
+      "key": key,
+      "type": int(params.get_type(key).value),
+      "default_value": base64.b64encode(value).decode('utf-8') if value else None,
+    }
+
+    if key in metadata:
+      meta_copy = metadata[key].copy()
+      param_entry["_extra"] = meta_copy
+
+    params_dict["params"].append(param_entry)
+
+  return {"keys": json.dumps(params_dict.get("params", []))}
+
+
+@dispatcher.add_method
+def getParams(params_keys: list[str], compression: bool = False) -> str | dict[str, str]:
+  params = Params()
+  available_keys: list[str] = [k.decode('utf-8') for k in Params().all_keys()]
+
+  try:
+    param_keys_validated = [key for key in params_keys if key in available_keys]
+    params_dict: dict[str, list[dict[str, str | bool | int]]] = {"params": []}
+    for key in param_keys_validated:
+      value = params.get(key)
+      if value is None:
+        continue
+
+      params_dict["params"].append({
+        "key": key,
+        "value": base64.b64encode(gzip.compress(value) if compression else value).decode('utf-8'),
+        "type": int(params.get_type(key).value),
+        "is_compressed": compression
+      })
+
+    response = {str(param.get('key')): str(param.get('value')) for param in params_dict.get("params", [])}
+    response |= {"params": json.dumps(params_dict.get("params", []))}
+    return response
+
+  except Exception as e:
+    cloudlog.exception("athenad.getParams.exception", e)
+    raise
+
+
+@dispatcher.add_method
+def saveParams(params_to_update: dict[str, str], compression: bool = False) -> None:
+  for key, value in params_to_update.items():
+    try:
+      save_param_from_base64_encoded_string(key, value, compression)
+    except Exception as e:
+      cloudlog.error(f"athenad.saveParams.exception {e}")
 
 
 def main(exit_event: threading.Event = None):
