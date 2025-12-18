@@ -124,7 +124,7 @@ procs = [
   PythonProcess("calibrationd", "selfdrive.locationd.calibrationd", only_onroad),
   PythonProcess("torqued", "selfdrive.locationd.torqued", only_onroad),
   PythonProcess("controlsd", "selfdrive.controls.controlsd", and_(not_joystick, iscar)),
-  PythonProcess("joystickd", "tools.joystick.joystickd", or_(joystick, notcar)),
+  PythonProcess("joystickd", "tools.joystick.joystickd", or_(joystick, webrtc)),
   PythonProcess("selfdrived", "selfdrive.selfdrived.selfdrived", only_onroad),
   PythonProcess("card", "selfdrive.car.card", only_onroad),
   PythonProcess("deleter", "system.loggerd.deleter", always_run),
