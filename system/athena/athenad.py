@@ -902,6 +902,12 @@ def getParamsAllKeysV1() -> dict[str, str]:
   for key in available_keys:
     value = params.get(key)
 
+    if value is not None and not isinstance(value, bytes):
+      if isinstance(value, bool):
+        value = b"1" if value else b"0"
+      else:
+        value = str(value).encode('utf-8')
+
     param_entry = {
       "key": key,
       "type": int(params.get_type(key).value),
