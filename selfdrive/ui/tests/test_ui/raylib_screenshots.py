@@ -154,11 +154,6 @@ def setup_openpilot_long_confirmation_dialog(click, pm: PubMaster, scroll=None):
   click(650, 960)  # toggle sunnypilot longitudinal control
 
 
-def setup_settings_sunnylink(click, pm: PubMaster, scroll=None):
-  setup_settings(click, pm)
-  click(278, 510)
-
-
 def setup_settings_models(click, pm: PubMaster, scroll=None):
   setup_settings(click, pm)
   click(278, 840)
@@ -298,7 +293,6 @@ CASES = {
 
 # sunnypilot cases
 CASES.update({
-  "settings_sunnylink": setup_settings_sunnylink,
   "settings_models": setup_settings_models,
   "settings_steering": setup_settings_steering,
   "settings_cruise": setup_settings_cruise,
@@ -369,7 +363,6 @@ def create_screenshots():
     with OpenpilotPrefix():
       params = Params()
       params.put("DongleId", "123456789012345")
-      params.put("SunnylinkDongleId", "123456789012345")
 
       # Set branch name
       params.put("UpdaterCurrentDescription", VERSION)

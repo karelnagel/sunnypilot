@@ -173,8 +173,6 @@ class SocketAudioOutput:
           self.sock.sendto(data, self.dest)
 
         count += 1
-        if count % 200 == 0:
-            print(f"Sent {count} audio frames", flush=True)
       except Exception as e:
         print(f"Socket send/resample error: {e}", flush=True)
 

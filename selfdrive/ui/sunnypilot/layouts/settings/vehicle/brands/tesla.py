@@ -46,8 +46,7 @@ class TeslaSettings(BrandSettings):
     coop_steering_desc = (
       f"{tr('Converts light steering input into a steering rotation.')} - " +
       f"{tr('It works at any speed, the faster you go the stiffer the steering gets.')}<br>" +
-      f"{tr('It can co-exist with the {lkas_feature}, which helps to reduce disengagements on faster corrections.'
-        ).format(lkas_feature=self.lkas_title)}"
+      f"{tr('It can co-exist with the {lkas_feature}, which helps to reduce disengagements on faster corrections.').format(lkas_feature=self.lkas_title)}"
     )
 
     low_speed_pause_desc = (
