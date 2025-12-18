@@ -877,7 +877,7 @@ def backoff(retries: int) -> int:
 
 
 @dispatcher.add_method
-def getParamsAllKeys() -> list[dict[str, str | bool | int | object | dict | None]]:
+def getAllParams() -> list[dict[str, str | bool | int | object | dict | None]]:
   try:
     with open(METADATA_PATH) as f:
       metadata = json.load(f)
@@ -909,42 +909,6 @@ def getParamsAllKeys() -> list[dict[str, str | bool | int | object | dict | None
     params_list.append(entry)
 
   return params_list
-
-
-@dispatcher.add_method
-def getParams(params_keys: tuple[str], compression: bool = False) -> str | dict[str, str]:
-  params_keys = list(params_keys)
-  params = Params()
-  available_keys: list[str] = [k.decode('utf-8') for k in Params().all_keys()]
-
-  try:
-    param_keys_validated = [key for key in params_keys if key in available_keys]
-    params_dict: dict[str, list[dict[str, str | bool | int]]] = {"params": []}
-    for key in param_keys_validated:
-      value = params.get(key)
-      if value is None:
-        continue
-
-      if not isinstance(value, bytes):
-        if isinstance(value, bool):
-          value = b"1" if value else b"0"
-        else:
-          value = str(value).encode('utf-8')
-
-      params_dict["params"].append({
-        "key": key,
-        "value": base64.b64encode(gzip.compress(value) if compression else value).decode('utf-8'),
-        "type": int(params.get_type(key).value),
-        "is_compressed": compression
-      })
-
-    response = {str(param.get('key')): str(param.get('value')) for param in params_dict.get("params", [])}
-    response |= {"params": json.dumps(params_dict.get("params", []))}
-    return response
-
-  except Exception as e:
-    cloudlog.exception("athenad.getParams.exception", e)
-    raise
 
 
 @dispatcher.add_method
