@@ -876,18 +876,8 @@ def backoff(retries: int) -> int:
   return random.randrange(0, min(128, int(2 ** retries)))
 
 
-
-def get_param_as_byte(key: str, get_default: bool = False) -> bytes | None:
-  return Params().get(key)
-
-def save_param_from_base64_encoded_string(key: str, value: str, compression: bool = False) -> None:
-  decoded_value = base64.b64decode(value)
-  if compression:
-    decoded_value = gzip.decompress(decoded_value)
-  Params().put(key, decoded_value)
-
 @dispatcher.add_method
-def getParamsAllKeysV1() -> dict[str, str]:
+def getParamsAllKeys() -> list[dict[str, str | bool | int | object | dict | None]]:
   try:
     with open(METADATA_PATH) as f:
       metadata = json.load(f)
@@ -897,7 +887,7 @@ def getParamsAllKeysV1() -> dict[str, str]:
 
   available_keys: list[str] = [k.decode('utf-8') for k in Params().all_keys()]
 
-  params_dict: dict[str, list[dict[str, str | bool | int | object | dict | None]]] = {"params": []}
+  params_list:  list[dict[str, str | bool | int | object | dict | None]] = []
   params = Params()
   for key in available_keys:
     value = params.get(key)
@@ -908,19 +898,17 @@ def getParamsAllKeysV1() -> dict[str, str]:
       else:
         value = str(value).encode('utf-8')
 
-    param_entry = {
+    entry = {
       "key": key,
       "type": int(params.get_type(key).value),
-      "default_value": base64.b64encode(value).decode('utf-8') if value else None,
+      "value": base64.b64encode(value).decode('utf-8') if value else None,
     }
 
-    if key in metadata:
-      meta_copy = metadata[key].copy()
-      param_entry["_extra"] = meta_copy
+    if key in metadata: entry["metadata"] = metadata[key].copy()
 
-    params_dict["params"].append(param_entry)
+    params_list.append(entry)
 
-  return {"keys": json.dumps(params_dict.get("params", []))}
+  return params_list
 
 
 @dispatcher.add_method
@@ -963,7 +951,10 @@ def getParams(params_keys: tuple[str], compression: bool = False) -> str | dict[
 def saveParams(params_to_update: dict[str, str], compression: bool = False) -> None:
   for key, value in params_to_update.items():
     try:
-      save_param_from_base64_encoded_string(key, value, compression)
+      decoded_value = base64.b64decode(value)
+      if compression:
+        decoded_value = gzip.decompress(decoded_value)
+      Params().put(key, decoded_value)
     except Exception as e:
       cloudlog.error(f"athenad.saveParams.exception {e}")
 
