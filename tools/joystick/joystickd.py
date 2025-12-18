@@ -39,7 +39,6 @@ def joystickd_thread():
 
     # reset joystick if it hasn't been received in a while
     should_reset_joystick = sm.recv_frame['testJoystick'] == 0 or (sm.frame - sm.recv_frame['testJoystick'])*DT_CTRL > 0.2
-    print(sm['testJoystick'])
     if not should_reset_joystick:
       joystick_axes = sm['testJoystick'].axes
     else:
