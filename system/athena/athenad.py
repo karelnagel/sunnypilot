@@ -33,7 +33,7 @@ from cereal import log
 from cereal.services import SERVICE_LIST
 from openpilot.common.api import Api, get_key_pair
 from openpilot.common.utils import CallbackReader, get_upload_stream
-from openpilot.common.params import Params
+from openpilot.common.params import Params, ParamKeyType
 from openpilot.common.realtime import set_core_affinity
 from openpilot.system.hardware import HARDWARE, PC
 from openpilot.system.loggerd.xattr_cache import getxattr, setxattr
@@ -913,12 +913,17 @@ def getAllParams() -> list[dict[str, str | bool | int | object | dict | None]]:
 
 @dispatcher.add_method
 def saveParams(params_to_update: dict[str, str], compression: bool = False) -> None:
+  params = Params()
   for key, value in params_to_update.items():
     try:
       decoded_value = base64.b64decode(value)
       if compression:
         decoded_value = gzip.decompress(decoded_value)
-      Params().put(key, decoded_value)
+      # Decode bytes to string for non-BYTES type params
+      key_type = params.get_type(key)
+      if key_type != ParamKeyType.BYTES:
+        decoded_value = decoded_value.decode('utf-8')
+      params.put(key, decoded_value)
     except Exception as e:
       cloudlog.error(f"athenad.saveParams.exception {e}")
 
