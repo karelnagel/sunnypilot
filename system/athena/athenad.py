@@ -912,16 +912,33 @@ def getAllParams() -> list[dict[str, str | bool | int | object | dict | None]]:
 
 
 @dispatcher.add_method
-def saveParams(params_to_update: dict[str, str], compression: bool = False) -> dict[str, str]:
+def saveParams(params_to_update: dict[str, str | None], compression: bool = False) -> dict[str, str]:
+  from openpilot.common.params_pyx import ParamKeyType
   params = Params()
   results = {}
   for key, value in params_to_update.items():
     try:
+      if value is None or value == "":
+        params.remove(key)
+        results[key] = "ok: removed"
+        continue
+
       decoded_value = base64.b64decode(value)
       if compression:
         decoded_value = gzip.decompress(decoded_value)
       decoded_str = decoded_value.decode('utf-8')
-      params.put(key, decoded_str)
+
+      key_type = params.get_type(key)
+      if key_type == ParamKeyType.BOOL:
+        typed_value = decoded_str in ('1', 'true', 'True')
+      elif key_type == ParamKeyType.INT:
+        typed_value = int(decoded_str)
+      elif key_type == ParamKeyType.FLOAT:
+        typed_value = float(decoded_str)
+      else:
+        typed_value = decoded_str
+
+      params.put(key, typed_value)
       results[key] = f"ok: {decoded_str}"
     except Exception as e:
       results[key] = f"error: {e}"
