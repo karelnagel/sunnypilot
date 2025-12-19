@@ -98,6 +98,7 @@ class MapboxIntegration:
         'location': {'longitude': step['maneuver']['location'][0], 'latitude': step['maneuver']['location'][1]},
         'modifier': step['maneuver'].get('modifier', 'none'),
         'bannerInstructions': step['bannerInstructions'],
+        'exit': step['maneuver'].get('exit', 0),
       }
       for step in leg['steps']
     ]

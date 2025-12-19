@@ -82,8 +82,10 @@ class NavigationHudRenderer(Widget):
     self._distance = ""
     self._maneuver_type = ""
     self._modifier = ""
+    self._exit = 0
     self._next_maneuver_type = ""
     self._next_modifier = ""
+    self._next_exit = 0
     self._has_next = False
     self._debug_info = ""
 
@@ -163,17 +165,25 @@ class NavigationHudRenderer(Widget):
 
     self._modifier = maneuver.modifier
     self._maneuver_type = maneuver.type
+    self._exit = maneuver.exit
     self._distance = self._format_distance(maneuver.distance, ui_state.is_metric)
 
     instruction = maneuver.instruction
-    parts = instruction.split(" onto ")
-    self._street = parts[1].strip() if len(parts) > 1 else instruction
+    if " onto " in instruction:
+      self._street = instruction.split(" onto ")[-1].strip()
+    elif " toward " in instruction:
+      self._street = instruction.split(" toward ")[-1].strip()
+    elif " to " in instruction:
+      self._street = instruction.split(" to ")[-1].strip()
+    else:
+      self._street = instruction
     self._street = self._street.replace(".", "")
 
     if len(nav.allManeuvers) > 2:
       next_maneuver = nav.allManeuvers[2]
       self._next_modifier = next_maneuver.modifier
       self._next_maneuver_type = next_maneuver.type
+      self._next_exit = next_maneuver.exit
       self._has_next = True
     else:
       self._has_next = False
@@ -198,6 +208,14 @@ class NavigationHudRenderer(Widget):
       dest_rect = rl.Rectangle(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
       source_rect = rl.Rectangle(0, 0, icon.width, icon.height)
       rl.draw_texture_pro(icon, source_rect, dest_rect, rl.Vector2(0, 0), 0, rl.WHITE)
+
+    if self._exit > 0 and self._maneuver_type in ("roundabout", "rotary"):
+      exit_text = str(self._exit)
+      exit_font_size = 60
+      exit_size = measure_text_cached(self._font_bold, exit_text, exit_font_size)
+      exit_x = icon_x + (ICON_SIZE - exit_size.x) / 2
+      exit_y = icon_y + (ICON_SIZE - exit_size.y) / 2
+      rl.draw_text_ex(self._font_bold, exit_text, rl.Vector2(exit_x, exit_y), exit_font_size, 0, rl.WHITE)
 
     distance_y = icon_y + ICON_SIZE + 5
     distance_size = measure_text_cached(self._font_bold, self._distance, 48)
@@ -232,6 +250,14 @@ class NavigationHudRenderer(Widget):
         dest_rect = rl.Rectangle(then_icon_x, then_icon_y, THEN_ICON_SIZE, THEN_ICON_SIZE)
         source_rect = rl.Rectangle(0, 0, next_icon.width, next_icon.height)
         rl.draw_texture_pro(next_icon, source_rect, dest_rect, rl.Vector2(0, 0), 0, rl.WHITE)
+
+        if self._next_exit > 0 and self._next_maneuver_type in ("roundabout", "rotary"):
+          exit_text = str(self._next_exit)
+          exit_font_size = 42
+          exit_size = measure_text_cached(self._font_bold, exit_text, exit_font_size)
+          exit_x = then_icon_x + (THEN_ICON_SIZE - exit_size.x) / 2
+          exit_y = then_icon_y + (THEN_ICON_SIZE - exit_size.y) / 2
+          rl.draw_text_ex(self._font_bold, exit_text, rl.Vector2(exit_x, exit_y), exit_font_size, 0, rl.WHITE)
 
   def _draw_wrapped_text(self, text: str, x: int, y: int, max_width: int, font_size: int) -> None:
     words = text.split()

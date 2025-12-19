@@ -142,7 +142,7 @@ class Navigationd:
 
     all_maneuvers = (
       [custom.Navigationd.Maneuver.new_message(distance=m['distance'], type=m['type'], modifier=m['modifier'],
-                                               instruction=m['instruction']) for m in progress['all_maneuvers']]
+                                               instruction=m['instruction'], exit=m.get('exit', 0)) for m in progress['all_maneuvers']]
       if progress
       else []
     )

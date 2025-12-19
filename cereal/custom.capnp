@@ -468,6 +468,7 @@ struct Navigationd @0xcb9fd56c7057593a {
     type @1 :Text;
     modifier @2 :Text;
     instruction @3 :Text;
+    exit @4 :UInt8;
   }
 }
 

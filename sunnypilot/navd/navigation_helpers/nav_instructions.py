@@ -55,7 +55,7 @@ class NavigationInstructions:
         distance = distance_to_end_of_step
       else:
         distance = step['cumulative_distance'] - closest_cumulative
-      all_maneuvers.append({'distance': distance, 'type': step['maneuver'], 'modifier': step['modifier'], 'instruction': step['instruction']})
+      all_maneuvers.append({'distance': distance, 'type': step['maneuver'], 'modifier': step['modifier'], 'instruction': step['instruction'], 'exit': step.get('exit', 0)})
 
     return {
       'distance_from_route': self.min_distance,
@@ -97,6 +97,7 @@ class NavigationInstructions:
         'maxspeed': maxspeed[min(closest_idx, len(maxspeed) - 1)] if len(maxspeed) > 0 else (0, 'kmh'),
         'modifier': string_to_direction(step['modifier']),
         'instruction': step['instruction'],
+        'exit': step.get('exit', 0),
       })
     self._cached_route = {
       'bearings': [bearing_between_two_points(geometry[i], geometry[i+2]) for i in range(len(geometry)-2)],
