@@ -18,6 +18,6 @@ class HudRendererSP(HudRenderer):
     self.navigation_hud = NavigationHudRenderer()
 
   def _render(self, rect: rl.Rectangle) -> None:
-    self.navigation_hud.render(rect)
     super()._render(rect)
+    self.navigation_hud.render(rect)
     self.developer_ui.render(rect)
