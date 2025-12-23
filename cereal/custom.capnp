@@ -462,6 +462,7 @@ struct Navigationd @0xcb9fd56c7057593a {
   distanceFromRoute @3 :Float32;
   allManeuvers @4 :List(Maneuver);
   valid @5 :Bool;
+  roadAlerts @6 :List(RoadAlert);
 
   struct Maneuver {
     distance @0 :Float32;
@@ -469,6 +470,12 @@ struct Navigationd @0xcb9fd56c7057593a {
     modifier @2 :Text;
     instruction @3 :Text;
     exit @4 :UInt8;
+  }
+
+  struct RoadAlert {
+    type @0 :Text;  # speedCamera, police, accident, hazard, construction
+    distance @1 :Float32;  # meters to alert
+    speedLimit @2 :UInt16;  # speed limit at camera (0 if unknown)
   }
 }
 

@@ -16,6 +16,7 @@ from openpilot.sunnypilot.navd.constants import NAV_CV
 from openpilot.sunnypilot.navd.helpers import Coordinate, parse_banner_instructions
 from openpilot.sunnypilot.navd.navigation_helpers.mapbox_integration import MapboxIntegration
 from openpilot.sunnypilot.navd.navigation_helpers.nav_instructions import NavigationInstructions
+from openpilot.sunnypilot.navd.road_alerts import RoadAlerts
 
 
 class Navigationd:
@@ -23,6 +24,7 @@ class Navigationd:
     self.params = Params()
     self.mapbox = MapboxIntegration()
     self.nav_instructions = NavigationInstructions()
+    self.road_alerts = RoadAlerts()
 
     self.sm = messaging.SubMaster(['carState', 'liveLocationKalman', 'gpsLocation'])
     self.pm = messaging.PubMaster(['navigationd'])
@@ -35,6 +37,7 @@ class Navigationd:
     self.allow_navigation: bool = False
     self.recompute_allowed: bool = False
     self.allow_recompute: bool = False
+    self.road_alerts_enabled: bool = False
     self.reroute_counter: int = 0
     self.cancel_route_counter: int = 0
 
@@ -50,6 +53,7 @@ class Navigationd:
         self.allow_navigation = self.params.get('AllowNavigation', return_default=True)
         self.new_destination = self.params.get('MapboxRoute')
         self.recompute_allowed = self.params.get('MapboxRecompute', return_default=True)
+        self.road_alerts_enabled = self.params.get_bool('RoadAlertsEnabled')
 
       # Handle clearing the route when MapboxRoute is set to empty/null
       if (self.new_destination == '' or self.new_destination is None) and self.destination is not None and self.destination != '':
@@ -130,6 +134,11 @@ class Navigationd:
 
     return banner_instructions, progress, nav_data
 
+  def _get_road_alerts(self) -> list[dict]:
+    if not self.road_alerts_enabled or self.last_position is None or self.last_bearing is None:
+      return []
+    return self.road_alerts.get_nearby_alerts(self.last_position, self.last_bearing)
+
   def _build_navigation_message(self, banner_instructions: str, progress: dict | None, nav_data: dict, valid: bool):
     msg = messaging.new_message('navigationd')
     msg.valid = valid
@@ -146,6 +155,12 @@ class Navigationd:
       else []
     )
     msg.navigationd.allManeuvers = all_maneuvers
+
+    alerts = self._get_road_alerts()
+    msg.navigationd.roadAlerts = [
+      custom.Navigationd.RoadAlert.new_message(type=a['type'], distance=a['distance'], speedLimit=a['speedLimit'])
+      for a in alerts
+    ]
     return msg
 
   def run(self):

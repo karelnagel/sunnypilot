@@ -40,6 +40,7 @@ class NavigationLayout(Widget):
       button_item("Remove Favorite", "Remove", "Remove a favorite", self._remove_fav),
       toggle_item_sp("Mapbox recompute", "Enable automatic route recomputation", param="MapboxRecompute"),
       toggle_item_sp("Navigation allowed", "Allow navigation to automatically take turns", param="NavDesiresAllowed"),
+      toggle_item_sp("Road alerts", "Show speed cameras and hazards on HUD", param="RoadAlertsEnabled"),
     ]
 
     self.items = [

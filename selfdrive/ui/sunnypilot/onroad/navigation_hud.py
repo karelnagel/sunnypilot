@@ -70,6 +70,14 @@ ICON_PADDING = 30
 THEN_SECTION_WIDTH = 180
 THEN_ICON_SIZE = 105
 
+# Road alerts constants
+ALERT_CONTAINER_WIDTH = 280
+ALERT_CONTAINER_HEIGHT = 120
+ALERT_ICON_SIZE = 60
+ALERT_COLOR_CAMERA = rl.Color(220, 53, 69, 255)  # Red
+ALERT_COLOR_POLICE = rl.Color(220, 53, 69, 255)  # Red
+ALERT_COLOR_HAZARD = rl.Color(255, 193, 7, 255)  # Yellow
+
 
 class NavigationHudRenderer(Widget):
   def __init__(self):
@@ -87,6 +95,7 @@ class NavigationHudRenderer(Widget):
     self._next_modifier = ""
     self._next_exit = 0
     self._has_next = False
+    self._road_alerts: list = []
 
   def _get_icon(self, maneuver_type: str, modifier: str) -> Texture2D | None:
     normalized_type = maneuver_type
@@ -134,6 +143,8 @@ class NavigationHudRenderer(Widget):
 
   def _update_state(self) -> None:
     sm = ui_state.sm
+    self._road_alerts = []
+
     if "navigationd" not in sm.data:
       self._valid = False
       return
@@ -144,6 +155,10 @@ class NavigationHudRenderer(Widget):
       return
 
     nav = sm["navigationd"]
+
+    # Get road alerts regardless of navigation validity
+    self._road_alerts = list(nav.roadAlerts) if nav.roadAlerts else []
+
     if not nav.valid or len(nav.allManeuvers) == 0:
       self._valid = False
       return
@@ -179,6 +194,9 @@ class NavigationHudRenderer(Widget):
       self._has_next = False
 
   def _render(self, rect: rl.Rectangle) -> None:
+    # Render road alerts even if navigation is not valid
+    self._render_road_alerts(rect)
+
     if not self._valid:
       return
 
@@ -272,3 +290,43 @@ class NavigationHudRenderer(Widget):
 
     for i, line in enumerate(lines[:2]):
       rl.draw_text_ex(self._font_bold, line, rl.Vector2(x, text_y + i * font_size), font_size, 0, rl.WHITE)
+
+  def _get_alert_color(self, alert_type: str) -> rl.Color:
+    if alert_type in ("speedCamera", "police"):
+      return ALERT_COLOR_CAMERA
+    return ALERT_COLOR_HAZARD
+
+  def _render_road_alerts(self, rect: rl.Rectangle) -> None:
+    if not self._road_alerts:
+      return
+
+    alert = self._road_alerts[0]
+    alert_y = CONTAINER_Y + CONTAINER_HEIGHT + 15
+    alert_x = int((rect.width - ALERT_CONTAINER_WIDTH) / 2)
+
+    # Background
+    alert_rect = rl.Rectangle(alert_x, alert_y, ALERT_CONTAINER_WIDTH, ALERT_CONTAINER_HEIGHT)
+    color = self._get_alert_color(alert.type)
+    rl.draw_rectangle_rounded(alert_rect, 0.3, 10, rl.Color(color.r, color.g, color.b, 200))
+
+    # Camera icon (draw a simple circle with camera shape)
+    icon_x = alert_x + 25
+    icon_y = alert_y + (ALERT_CONTAINER_HEIGHT - ALERT_ICON_SIZE) // 2
+    icon_center_x = icon_x + ALERT_ICON_SIZE // 2
+    icon_center_y = icon_y + ALERT_ICON_SIZE // 2
+
+    # Draw camera icon as circle with inner details
+    rl.draw_circle(icon_center_x, icon_center_y, ALERT_ICON_SIZE // 2, rl.WHITE)
+    rl.draw_circle(icon_center_x, icon_center_y, ALERT_ICON_SIZE // 2 - 8, color)
+    rl.draw_circle(icon_center_x, icon_center_y, 12, rl.WHITE)
+
+    # Distance text
+    distance_str = self._format_distance(alert.distance, ui_state.is_metric)
+    text_x = icon_x + ALERT_ICON_SIZE + 20
+    text_y = alert_y + 25
+
+    rl.draw_text_ex(self._font_bold, distance_str, rl.Vector2(text_x, text_y), 48, 0, rl.WHITE)
+
+    # Alert type label
+    label = "CAMERA" if alert.type == "speedCamera" else alert.type.upper()
+    rl.draw_text_ex(self._font_medium, label, rl.Vector2(text_x, text_y + 50), 32, 0, rl.WHITE)
