@@ -71,6 +71,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"LastGPSPosition", {PERSISTENT, STRING}},
     {"LastManagerExitReason", {CLEAR_ON_MANAGER_START, STRING}},
     {"LastOffroadStatusPacket", {CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION, JSON}},
+    {"LastAgnosPowerMonitorShutdown", {CLEAR_ON_MANAGER_START, STRING}},
     {"LastPowerDropDetected", {CLEAR_ON_MANAGER_START, STRING}},
     {"LastUpdateException", {CLEAR_ON_MANAGER_START, STRING}},
     {"LastUpdateRouteCount", {PERSISTENT, INT, "0"}},
@@ -138,6 +139,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"BlinkerMinLateralControlSpeed", {PERSISTENT | BACKUP, INT, "20"}},  // MPH or km/h
     {"BlinkerPauseLateralControl", {PERSISTENT | BACKUP, INT, "0"}},
     {"Brightness", {PERSISTENT | BACKUP, INT, "0"}},
+    {"CarList", {PERSISTENT, JSON}},
     {"CarParamsSP", {CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION, BYTES}},
     {"CarParamsSPCache", {CLEAR_ON_MANAGER_START, BYTES}},
     {"CarParamsSPPersistent", {PERSISTENT, BYTES}},
@@ -189,6 +191,15 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"ModelManager_LastSyncTime", {CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION, INT, "0"}},
     {"ModelManager_ModelsCache", {PERSISTENT | BACKUP, JSON}},
 
+    // Navigation params
+    {"AllowNavigation", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"MapboxFavorites", {PERSISTENT | BACKUP, STRING}},
+    {"MapboxToken", {PERSISTENT | BACKUP, STRING, "pk.eyJ1IjoiY29tbWFhaSIsImEiOiJjangyYXV0c20wMGU2NDluMWR4amUydGl5In0.6Vb11S6tdX6Arpj6trRE_g"}},
+    {"MapboxSettings", {CLEAR_ON_MANAGER_START, JSON}},
+    {"MapboxRoute", {PERSISTENT, STRING}},
+    {"MapboxRecompute", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"NavDesiresAllowed", {PERSISTENT | BACKUP, BOOL, "0"}},
+
     // Neural Network Lateral Control
     {"NeuralNetworkLateralControl", {PERSISTENT | BACKUP, BOOL, "0"}},
 
@@ -213,6 +224,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"TeslaCoopSteering", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"TeslaLkasSteering", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"TeslaLowSpeedSteerPause", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"ToyotaEnforceStockLongitudinal", {PERSISTENT | BACKUP, BOOL, "0"}},
 
     {"DynamicExperimentalControl", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"BlindSpot", {PERSISTENT | BACKUP, BOOL, "0"}},
@@ -264,4 +276,9 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"TorqueParamsOverrideEnabled", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"TorqueParamsOverrideFriction", {PERSISTENT | BACKUP, FLOAT, "0.1"}},
     {"TorqueParamsOverrideLatAccelFactor", {PERSISTENT | BACKUP, FLOAT, "2.5"}},
+
+    // new-connect
+    {"WebRTCOnline", {CLEAR_ON_MANAGER_START, BOOL}},
+    {"EnableRemoteParams", {PERSISTENT, BOOL, "1"}},
+    {"EnableWebRTC", {PERSISTENT, BOOL, "1"}},
 };
