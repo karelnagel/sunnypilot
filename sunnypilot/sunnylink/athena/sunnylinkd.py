@@ -41,8 +41,6 @@ DISALLOW_LOG_UPLOAD = threading.Event()
 METADATA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "params_metadata.json")
 
 params = Params()
-sunnylink_dongle_id = params.get("SunnylinkDongleId")
-sunnylink_api = SunnylinkApi(sunnylink_dongle_id)
 
 # Parameters that should never be remotely modified for security reasons
 BLOCKED_PARAMS = {
