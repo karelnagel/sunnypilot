@@ -192,9 +192,11 @@ class Navigationd:
       self._update_params()
       banner_instructions, progress, nav_data = self._update_navigation()
 
-      msg = self._build_navigation_message(banner_instructions, progress, nav_data, valid=localizer_valid)
+      # Only publish when we have valid location data to avoid triggering commIssue
+      if localizer_valid:
+        msg = self._build_navigation_message(banner_instructions, progress, nav_data, valid=localizer_valid)
+        self.pm.send('navigationd', msg)
 
-      self.pm.send('navigationd', msg)
       self.rk.keep_time()
 
 
