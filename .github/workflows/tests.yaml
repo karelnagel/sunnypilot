@@ -21,7 +21,6 @@ env:
   PYTHONWARNINGS: error
   BASE_IMAGE: sunnypilot-base
   AZURE_TOKEN: ${{ secrets.AZURE_COMMADATACI_OPENPILOTCI_TOKEN }}
-  MAPBOX_TOKEN_CI: ${{ secrets.MAPBOX_TOKEN_CI }}
 
   DOCKER_LOGIN: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
   BUILD: release/ci/docker_build_sp.sh base
