@@ -10,7 +10,6 @@ from jeepney.bus_messages import MatchRule, message_bus
 from jeepney.io.blocking import open_dbus_connection as open_dbus_connection_blocking
 from jeepney.io.threading import DBusRouter, open_dbus_connection as open_dbus_connection_threading
 from jeepney.low_level import MessageType
-from jeepney.wrappers import Properties
 
 from openpilot.common.swaglog import cloudlog
 
@@ -324,8 +323,10 @@ class BluetoothManager:
         dev_addr = DBusAddress(device.device_path, bus_name=BLUEZ, interface=BLUEZ_DEVICE_IFACE)
 
         # Trust the device first
-        props = Properties(dev_addr)
-        self._router_main.send_and_get_reply(props.set(BLUEZ_DEVICE_IFACE, "Trusted", ("b", True)))
+        props_addr = DBusAddress(device.device_path, bus_name=BLUEZ, interface="org.freedesktop.DBus.Properties")
+        self._router_main.send_and_get_reply(
+          new_method_call(props_addr, "Set", "ssv", (BLUEZ_DEVICE_IFACE, "Trusted", ("b", True)))
+        )
 
         # Pair
         reply = self._router_main.send_and_get_reply(new_method_call(dev_addr, "Pair"))
