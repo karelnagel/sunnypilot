@@ -17,6 +17,7 @@ from openpilot.selfdrive.ui.sunnypilot.layouts.settings.device import DeviceLayo
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.display import DisplayLayout
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.models import ModelsLayout
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.network import NetworkUISP
+from openpilot.selfdrive.ui.sunnypilot.layouts.settings.bluetooth import BluetoothUISP
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.osm import OSMLayout
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.software import SoftwareLayoutSP
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.steering import SteeringLayout
@@ -28,6 +29,7 @@ from openpilot.system.ui.lib.application import gui_app, MousePos
 from openpilot.system.ui.lib.multilang import tr_noop
 from openpilot.system.ui.lib.text_measure import measure_text_cached
 from openpilot.system.ui.lib.wifi_manager import WifiManager
+from openpilot.system.ui.lib.bluetooth_manager import BluetoothManager
 from openpilot.system.ui.sunnypilot.lib.styles import style
 from openpilot.system.ui.widgets import Widget
 from openpilot.system.ui.widgets.scroller_tici import Scroller
@@ -40,6 +42,7 @@ OP.PanelType = IntEnum(  # type: ignore
   "PanelType",
   [es.name for es in OP.PanelType] + [
     "SUNNYLINK",
+    "BLUETOOTH",
     "MODELS",
     "STEERING",
     "CRUISE",
@@ -108,9 +111,13 @@ class SettingsLayoutSP(OP.SettingsLayout):
     wifi_manager = WifiManager()
     wifi_manager.set_active(False)
 
+    bluetooth_manager = BluetoothManager()
+    bluetooth_manager.set_active(False)
+
     self._panels = {
       OP.PanelType.DEVICE: PanelInfo(tr_noop("Device"), DeviceLayoutSP(), icon="../../sunnypilot/selfdrive/assets/offroad/icon_home.png"),
       OP.PanelType.NETWORK: PanelInfo(tr_noop("Network"), NetworkUISP(wifi_manager), icon="icons/network.png"),
+      OP.PanelType.BLUETOOTH: PanelInfo(tr_noop("Bluetooth"), BluetoothUISP(bluetooth_manager), icon="icons/network.png"),
       OP.PanelType.SUNNYLINK: PanelInfo(tr_noop("sunnylink"), SunnylinkLayout(), icon="icons/wifi_strength_full.png"),
       OP.PanelType.TOGGLES: PanelInfo(tr_noop("Toggles"), TogglesLayout(), icon="../../sunnypilot/selfdrive/assets/offroad/icon_toggle.png"),
       OP.PanelType.SOFTWARE: PanelInfo(tr_noop("Software"), SoftwareLayoutSP(), icon="../../sunnypilot/selfdrive/assets/offroad/icon_software.png"),

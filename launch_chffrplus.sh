@@ -16,6 +16,15 @@ function agnos_init {
   sudo chgrp gpu /dev/adsprpc-smd /dev/ion /dev/kgsl-3d0
   sudo chmod 660 /dev/adsprpc-smd /dev/ion /dev/kgsl-3d0
 
+  # Attach Bluetooth UART if available (requires Bluetooth-enabled kernel)
+  if [ -e /dev/ttyHS1 ]; then
+    if ! pgrep btattach > /dev/null 2>&1; then
+      echo "Starting btattach for Bluetooth..."
+      sudo btattach -B /dev/ttyHS1 -S 115200 &
+      sleep 2  # Wait for Bluetooth adapter to initialize
+    fi
+  fi
+
   # Check if AGNOS update is required
   if [ $(< /VERSION) != "$AGNOS_VERSION" ]; then
     AGNOS_PY="$DIR/system/hardware/tici/agnos.py"

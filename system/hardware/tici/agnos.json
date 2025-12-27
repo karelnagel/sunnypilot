@@ -56,14 +56,14 @@
   },
   {
     "name": "boot",
-    "url": "https://commadist.azureedge.net/agnosupdate/boot-90bd687e9e407834d4ee1b07f3d05527dfae0ff09c0cacd64cfd6097f6b10e2c.img.xz",
-    "hash": "90bd687e9e407834d4ee1b07f3d05527dfae0ff09c0cacd64cfd6097f6b10e2c",
-    "hash_raw": "90bd687e9e407834d4ee1b07f3d05527dfae0ff09c0cacd64cfd6097f6b10e2c",
-    "size": 17496064,
+    "url": "https://github.com/karelnagel/agnos-kernel-sdm845/releases/download/v15.1-bluetooth/boot.img.xz",
+    "hash": "b46c3a1519b6b5327ed4da22a1db63b3a8af6a21c09ee0c5d3ca31e7f10ba136",
+    "hash_raw": "1856f056ecf53c73abbd31414e3a44c2c05f2f549f5ed122af1c8bd89ba0b89d",
+    "size": 17856512,
     "sparse": false,
     "full_check": true,
     "has_ab": true,
-    "ondevice_hash": "35014c39b55010ac955c10f808b088e74259147c7a8cbf989b3dff7d95a1e8ae"
+    "ondevice_hash": "ae20ce606ddc2b27c4578d43dab24c888178d09499413e658f425820a30045f1"
   },
   {
     "name": "system",

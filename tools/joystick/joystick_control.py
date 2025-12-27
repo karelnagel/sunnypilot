@@ -273,7 +273,7 @@ if __name__ == "__main__":
     print("Cancel: Triangle button")
     print()
     print("Before running, make sure to:")
-    print("1. sudo btattach -B /dev/ttyHS0 -S 115200 &")
+    print("1. sudo btattach -B /dev/ttyHS1 -S 115200 &")
     print("2. Pair controller via hcitool scan + Python dbus")
     joystick = BluetoothGamepad()
   else:
