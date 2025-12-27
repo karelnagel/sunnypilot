@@ -135,8 +135,20 @@ class BluetoothManager:
         self._scan_thread.start()
         self._state_thread.start()
         cloudlog.debug("BluetoothManager initialized")
+        self._auto_connect_trusted_devices()
 
     threading.Thread(target=worker, daemon=True).start()
+
+  def _auto_connect_trusted_devices(self):
+    """Auto-connect to trusted/paired devices that are not currently connected."""
+    try:
+      self._update_devices()
+      for device in self._devices:
+        if device.trusted and device.paired and not device.connected:
+          cloudlog.info(f"Auto-connecting to trusted device: {device.name}")
+          self.connect_device(device)
+    except Exception as e:
+      cloudlog.warning(f"Error auto-connecting devices: {e}")
 
   def add_callbacks(
     self,

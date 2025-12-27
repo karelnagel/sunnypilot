@@ -17,9 +17,10 @@ function agnos_init {
   sudo chgrp gpu /dev/adsprpc-smd /dev/ion /dev/kgsl-3d0
   sudo chmod 660 /dev/adsprpc-smd /dev/ion /dev/kgsl-3d0
 
-  # Attach Bluetooth UART if available
-  if [ -e /dev/ttyHS0 ] && ! pgrep -x btattach > /dev/null; then
+  # Attach Bluetooth UART if available (requires Bluetooth-enabled kernel)
+  if [ -e /dev/ttyHS0 ] && ! pgrep btattach > /dev/null; then
     sudo btattach -B /dev/ttyHS0 -S 115200 &
+    sleep 2  # Wait for Bluetooth adapter to initialize
   fi
 
   if [ $(< /VERSION) != "$AGNOS_VERSION" ]; then

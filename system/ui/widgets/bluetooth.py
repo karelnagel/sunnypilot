@@ -250,9 +250,16 @@ class BluetoothUI(Widget):
         )
         self._action_buttons[device.address].set_touch_valid_callback(lambda: self.scroll_panel.is_touch_valid())
 
-    # Clear state if device is no longer in list
+    # Clear state if device is no longer in list or if operation completed
     if self._state != UIState.IDLE and self._state_device:
-      if not any(d.address == self._state_device.address for d in devices):
+      matching_device = next((d for d in devices if d.address == self._state_device.address), None)
+      if not matching_device:
+        self._state = UIState.IDLE
+        self._state_device = None
+      elif self._state == UIState.CONNECTING and matching_device.connected:
+        self._state = UIState.IDLE
+        self._state_device = None
+      elif self._state == UIState.DISCONNECTING and not matching_device.connected:
         self._state = UIState.IDLE
         self._state_device = None
 
