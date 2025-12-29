@@ -192,12 +192,12 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"ModelManager_ModelsCache", {PERSISTENT | BACKUP, JSON}},
 
     // Navigation params
-    {"AllowNavigation", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"AllowNavigation", {PERSISTENT | BACKUP, BOOL, "1"}},
     {"MapboxFavorites", {PERSISTENT | BACKUP, STRING}},
     {"MapboxToken", {PERSISTENT | BACKUP, STRING, "pk.eyJ1IjoiY29tbWFhaSIsImEiOiJjangyYXV0c20wMGU2NDluMWR4amUydGl5In0.6Vb11S6tdX6Arpj6trRE_g"}},
     {"MapboxSettings", {CLEAR_ON_MANAGER_START, JSON}},
     {"MapboxRoute", {PERSISTENT, STRING}},
-    {"MapboxRecompute", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"MapboxRecompute", {PERSISTENT | BACKUP, BOOL, "1"}},
     {"NavDesiresAllowed", {PERSISTENT | BACKUP, BOOL, "0"}},
 
     // Neural Network Lateral Control
@@ -210,7 +210,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"SunnylinkCache_Users", {PERSISTENT, STRING}},
     {"SunnylinkDongleId", {PERSISTENT, STRING}},
     {"SunnylinkdPid", {PERSISTENT, INT}},
-    {"SunnylinkEnabled", {PERSISTENT, BOOL, "1"}},
+    {"SunnylinkEnabled", {PERSISTENT, BOOL, "0"}},
     {"SunnylinkTempFault", {CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION, BOOL, "0"}},
 
     // Backup Manager params
@@ -277,7 +277,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"TorqueParamsOverrideFriction", {PERSISTENT | BACKUP, FLOAT, "0.1"}},
     {"TorqueParamsOverrideLatAccelFactor", {PERSISTENT | BACKUP, FLOAT, "2.5"}},
 
-    // new-connect
+    // Asius
     {"WebRTCOnline", {CLEAR_ON_MANAGER_START, BOOL}},
     {"EnableRemoteParams", {PERSISTENT, BOOL, "1"}},
     {"EnableWebRTC", {PERSISTENT, BOOL, "1"}},
