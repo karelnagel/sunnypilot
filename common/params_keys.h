@@ -279,4 +279,6 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"WebRTCOnline", {CLEAR_ON_MANAGER_START, BOOL}},
     {"EnableRemoteParams", {PERSISTENT, BOOL, "1"}},
     {"EnableWebRTC", {PERSISTENT, BOOL, "1"}},
+    {"APIHost", {PERSISTENT, STRING, "https://api.konik.ai"}},
+    {"AthenaHost", {PERSISTENT, STRING, "wss://athena.konik.ai"}},
 };
