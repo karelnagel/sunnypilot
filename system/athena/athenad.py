@@ -42,7 +42,7 @@ from openpilot.system.version import get_build_metadata
 from openpilot.system.hardware.hw import Paths
 
 
-ATHENA_HOST = os.getenv('ATHENA_HOST', Params().get("AthenaHost", encoding='utf-8'))
+ATHENA_HOST = os.getenv('ATHENA_HOST', Params().get("AthenaHost"))
 HANDLER_THREADS = int(os.getenv('HANDLER_THREADS', "4"))
 LOCAL_PORT_WHITELIST = {22, }  # SSH
 
